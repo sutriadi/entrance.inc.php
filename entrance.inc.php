@@ -77,16 +77,7 @@ if ($_POST AND isset($_POST['memberid']))
 		);
 		$dbs->query($insql);
 		
-		$dsql = sprintf("SELECT * FROM visitor_count WHERE DATE(checkin_date) = DATE(NOW())");
-		$count = $dbs->query($dsql);
-		$count = $count->num_rows;
-		
-		$message = sprintf('<p align="center"><strong>%d %s on %s</strong></p>',
-				$count,
-				__('visitor(s)'),
-				date('d-m-Y')
-			)
-			. '<table style="width: 100%;">'
+		$message = '<table style="width: 100%;">'
 			. '<tr>'
 				. sprintf('<td width="120px">%s</td>', __('ID'))
 				. sprintf('<td width="400px">%s</td>', $d->member_id)
@@ -112,11 +103,14 @@ if ($_POST AND isset($_POST['memberid']))
 				. sprintf('<td>%s</td>', __('State'))
 				. sprintf('<td>%s</td>', $expire === true ? __('Expired') : __('Active'))
 			. '</tr>'
+/*
+			. sprintf('<tr><td colspan="3" style="text-align: center;">%s, %s</td></tr>', $d->member_name, __('thank you for inserting your data to our visitor log.'))
+*/
 			. '</table>';
 	}
 	else
 	{
-		$message = __('Member ID invalid');
+		$message = '<p>' . __('Member ID invalid') . '</p>';
 	}
 	$_SESSION['entrance_message'] = $message;
 	header("Location: ?p=entrance");
@@ -133,9 +127,21 @@ else if (isset($_SESSION['entrance_message']))
 		unset($_SESSION['entrance_message']);
 	}
 }
+
+$dsql = sprintf("SELECT * FROM visitor_count WHERE DATE(checkin_date) = DATE(NOW())");
+$count = $dbs->query($dsql);
+$count = $count->num_rows;
+
+$countinfo = sprintf('<p align="center"><strong>%d %s on %s</strong></p>',
+	$count,
+	__('visitor(s)'),
+	date('d-m-Y')
+);
+
 ?>
 
 	<h3><?php echo __('Visitor Counter');?></h3>
+	<?php echo $countinfo;?>
 	<form id="regclient" name="regclient" method="POST" action="?p=entrance">
 		<p>
 			<label for="memberid">Member ID :</label>
